@@ -1,0 +1,5 @@
+[
+    {"id": 1, "user_id": 1, "parameter_id": 1, "value": 98.5, "date": "2026-09-15"},
+    {"id": 2, "user_id": 1, "parameter_id": 4, "value": 182.0, "date": "2026-09-15"},
+    {"id": 3, "user_id": 2, "parameter_id": 1, "value": 88.0, "date": "2026-09-16"}
+]
