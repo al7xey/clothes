@@ -1,31 +1,25 @@
 from django.http import Http404
 from django.shortcuts import render
 
-from models.items import (
-    CHEST_PARAMETER_ID, find_item_by_id, get_fit_status, is_item_suitable,
-)
-from models.parameters import get_parameter_by_id
-from storage import load_items, load_parameters, load_users, load_values
+from db.database import fetch_all, fetch_one, fetch_value
+from models.items import CHEST_PARAMETER_ID, Item, get_fit_status
 
 
 def items(request):
-    """Список вещей пользователей."""
-    users_list = load_users("data/users.json")
-    context = {"items": load_items("data/items.json", users_list)}
+    """Список вещей пользователей (JOIN с владельцами)."""
+    context = {"items": fetch_all("list_items")}
     return render(request, "items/list.html", context)
 
 
 def item_detail(request, item_id):
     """Страница вещи с проверкой размера; если вещи нет – ответ 404."""
-    users_list = load_users("data/users.json")
-    parameters_list = load_parameters("data/parameters.json")
-    item = find_item_by_id(load_items("data/items.json", users_list), item_id)
+    item = fetch_one("item_by_id", (item_id,))
     if item is None:
         raise Http404("Вещь не найдена")
-    values_list = load_values(
-        "data/measurements.json", users_list, parameters_list)
-    chest = get_parameter_by_id(parameters_list, CHEST_PARAMETER_ID)
-    suitable = is_item_suitable(values_list, item, chest)
+    chest = fetch_value("latest_amount", (item["user_id"], CHEST_PARAMETER_ID))
+    suitable = None
+    if chest is not None:
+        suitable = Item.recommend_size(chest) == item["size"].upper()
     context = {
         "item": item,
         "suitable": suitable,

@@ -1,8 +1,8 @@
 <li class="list-group-item d-flex justify-content-between">
     <a href="{% url 'measurements:detail' value.id %}">
-        {{ value.user.name }}: {{ value.parameter.name }}
+        {{ value.user_name }}: {{ value.parameter_name }}
     </a>
     <span class="badge bg-success">
-        {{ value.amount }} {{ value.parameter.unit }}
+        {{ value.amount }} {{ value.unit }}
     </span>
 </li>

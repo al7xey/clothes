@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h1>Статистика</h1>
+<div class="row mb-4">
+    <div class="col"><div class="card card-body">
+        Пользователей: <strong>{{ users_total }}</strong>
+    </div></div>
+    <div class="col"><div class="card card-body">
+        Мерок: <strong>{{ measurements_total }}</strong>
+    </div></div>
+    <div class="col"><div class="card card-body">
+        Вещей: <strong>{{ items_total }}</strong>
+    </div></div>
+</div>
+
+<h2 class="h4">Мерки по параметрам</h2>
+<table class="table table-sm">
+    <thead>
+        <tr><th>Параметр</th><th>Мерок</th><th>Среднее значение</th></tr>
+    </thead>
+    <tbody>
+        {% for row in per_parameter %}
+        <tr>
+            <td>{{ row.parameter_name }}</td>
+            <td>{{ row.total }}</td>
+            <td>{{ row.average|default:"–" }} {% if row.average %}{{ row.unit }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2 class="h4">Вещи по пользователям</h2>
+<ul>
+    {% for row in items_per_user %}
+        <li>{{ row.user_name }}: {{ row.total }}</li>
+    {% endfor %}
+</ul>
+
+<h2 class="h4">Пользователи, у которых две мерки и больше</h2>
+<ul>
+    {% for row in active_users %}
+        <li>{{ row.user_name }}: {{ row.total }}</li>
+    {% empty %}
+        <li>Таких пользователей нет.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

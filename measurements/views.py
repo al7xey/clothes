@@ -1,27 +1,30 @@
 from django.http import Http404
 from django.shortcuts import render
 
-from models.values import find_value_by_id
-from storage import load_parameters, load_users, load_values
-
-
-def _load_all_values():
-    """Загрузить мерки вместе со связанными пользователями и параметрами."""
-    users_list = load_users("data/users.json")
-    parameters_list = load_parameters("data/parameters.json")
-    return load_values("data/measurements.json", users_list, parameters_list)
+from db.database import fetch_all, fetch_one
 
 
 def measurements(request):
-    """Список мерок пользователей."""
-    context = {"values": _load_all_values()}
+    """Список мерок пользователей (JOIN трёх таблиц)."""
+    context = {"values": fetch_all("list_measurements")}
     return render(request, "measurements/list.html", context)
 
 
 def measurement_detail(request, value_id):
     """Страница мерки; если мерки нет – ответ 404."""
-    value = find_value_by_id(_load_all_values(), value_id)
+    value = fetch_one("measurement_by_id", (value_id,))
     if value is None:
         raise Http404("Мерка не найдена")
-    context = {"value": value, "in_range": value.is_in_range()}
-    return render(request, "measurements/detail.html", context)
+    return render(request, "measurements/detail.html", {"value": value})
+
+
+def measurements_by_date(request):
+    """Поиск мерок по дате: параметр запроса ?date=ГГГГ-ММ-ДД."""
+    date = request.GET.get("date", "").strip()
+    found = fetch_all("measurements_by_date", (date,)) if date else None
+    context = {
+        "date": date,
+        "values": found,
+        "dates": fetch_all("measurement_dates"),
+    }
+    return render(request, "measurements/by_date.html", context)

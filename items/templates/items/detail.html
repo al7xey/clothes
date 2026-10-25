@@ -6,7 +6,7 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">{{ item.name }}</h5>
-        <p class="card-text"><strong>Владелец:</strong> {{ item.user.name }}</p>
+        <p class="card-text"><strong>Владелец:</strong> {{ item.user_name }}</p>
         <p class="card-text"><strong>Размер вещи:</strong> {{ item.size }}</p>
         <p class="card-text">
             {% if suitable is True %}

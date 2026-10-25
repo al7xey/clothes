@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Мерки по дате{% endblock %}
+
+{% block content %}
+<h1>Мерки по дате</h1>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input type="date" name="date" value="{{ date }}" class="form-control">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Найти</button>
+        <a href="{% url 'measurements:list' %}" class="btn btn-outline-secondary">
+            Все мерки
+        </a>
+    </div>
+</form>
+
+{% if values is None %}
+    <p class="text-muted">Выберите дату. Даты с замерами:</p>
+    <ul>
+        {% for row in dates %}
+            <li>
+                <a href="{% url 'measurements:by_date' %}?date={{ row.value_date }}">
+                    {{ row.value_date }}
+                </a>
+                – мерок: {{ row.total }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="text-muted">Найдено мерок за {{ date }}: {{ values|length }}</p>
+    <ul class="list-group">
+        {% for value in values %}
+            {% include "measurements/includes/value_row.html" %}
+        {% empty %}
+            <li class="list-group-item">За эту дату мерок нет.</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

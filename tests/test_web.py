@@ -109,3 +109,35 @@ def test_static_files_exist():
 def test_templates_exist():
     for name in ("base.html", "includes/navigation.html", "404.html"):
         assert (BASE_DIR / "templates" / name).is_file()
+
+
+# ---- ПР7: страницы, читающие данные из SQLite ----
+
+def test_statistics_page(client):
+    text = client.get("/statistics/").content.decode()
+    assert "Статистика" in text
+    assert "Мерки по параметрам" in text
+    assert "Алексей Семенов: 2" in text
+
+
+def test_by_date_page_without_date_lists_dates(client):
+    text = client.get("/measurements/by-date/").content.decode()
+    assert "2026-09-15" in text
+
+
+def test_by_date_page_finds_measurements(client):
+    url = "/measurements/by-date/?date=2026-09-15"
+    text = client.get(url).content.decode()
+    assert "Найдено мерок за 2026-09-15: 2" in text
+
+
+def test_by_date_page_empty_result(client):
+    url = "/measurements/by-date/?date=2000-01-01"
+    text = client.get(url).content.decode()
+    assert "За эту дату мерок нет" in text
+
+
+def test_items_page_reads_from_database(client):
+    text = client.get("/items/2/").content.decode()
+    assert "Платье летнее" in text
+    assert "Мария Иванова" in text

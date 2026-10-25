@@ -198,9 +198,26 @@ HTML больше не собирается в Python-коде: view-функц�
 пространства имён: `homepage:index`, `parameters:list`, `parameters:detail`,
 `measurements:list`, `measurements:detail`, `items:list`, `items:detail`.
 
+## База данных SQLite (ПР7)
+
+Данные веб-приложения хранятся в файле `data/clothes.sqlite`
+(таблицы `users`, `parameters`, `measurements`, `items` со связями
+через внешние ключи).
+
+- `sql/schema.sql` – создание таблиц и индексов;
+- `sql/queries.sql` – именованные SQL-запросы (выборки, `WHERE`, `JOIN`,
+  `COUNT`, `GROUP BY`, `HAVING`);
+- `db/database.py` – подключение (`sqlite3.Row`, внешние ключи включены),
+  загрузка запросов и функции `fetch_all`, `fetch_one`, `fetch_value`;
+- `db/import_json.py` – перенос данных из JSON в базу.
+
+Запросы выполняются только с параметрами (`?`), без подстановки строк.
+Пересоздать базу из JSON: `python -m db.import_json`.
+
+Новые страницы: `/measurements/by-date/?date=2026-09-15` (мерки по дате) и
+`/statistics/` (количество записей и группировки).
+
 ## План развития
-- шаблоны Django и статические файлы;
-- подключение базы данных;
 - реализация пользователей;
 - разработка API;
 - контейнеризация приложения;
