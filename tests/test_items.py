@@ -50,3 +50,12 @@ def test_fit_status_texts():
     assert "не подходит" in get_fit_status(False)
     assert "подходит" in get_fit_status(True)
     assert "Нет мерки" in get_fit_status(None)
+
+
+def test_find_item_by_id():
+    from models.items import find_item_by_id
+
+    owner = User(1, "Алексей", "a@example.com")
+    item = Item(3, owner, "Куртка", "L")
+    assert find_item_by_id([item], 3) is item
+    assert find_item_by_id([item], 4) is None

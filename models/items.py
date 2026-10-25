@@ -92,3 +92,11 @@ def show_items(items: List[Item]) -> None:
     """Вывести вещи."""
     for item in items:
         print(f"{item.id}. {item}")
+
+
+def find_item_by_id(items: List[Item], item_id: int) -> Optional[Item]:
+    """Найти вещь по идентификатору."""
+    for item in items:
+        if item.id == item_id:
+            return item
+    return None

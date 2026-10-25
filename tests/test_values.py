@@ -53,3 +53,13 @@ def test_latest_amount_and_remove():
     assert remove_value(values, 2)
     assert get_latest_amount(values, user, chest) == 96
     assert not remove_value(values, 42)
+
+
+def test_find_value_by_id():
+    from models.values import find_value_by_id
+
+    user = User(1, "Алексей", "a@example.com")
+    chest = Parameter(1, "Обхват груди", "см", 60, 150)
+    value = Value(7, user, chest, 98.5, "2026-09-15")
+    assert find_value_by_id([value], 7) is value
+    assert find_value_by_id([value], 8) is None

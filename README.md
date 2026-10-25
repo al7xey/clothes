@@ -82,6 +82,9 @@
     ├── requirements.txt
     ├── pytest.ini
     ├── .flake8
+    ├── manage.py
+    ├── sizesystem/        (Django-проект)
+    ├── homepage/ parameters/ measurements/ items/  (Django-приложения)
     ├── main.py
     ├── storage.py
     ├── utils.py
@@ -135,8 +138,49 @@ JSON:
 
     flake8
 
+## Веб-интерфейс на Django (ПР5)
+Консольное приложение (ПР1–ПР3) сохранено. Рядом создан веб-интерфейс на
+Django 5.2: страницы показывают данные из JSON-файлов, используя классы
+`Parameter`, `User`, `Value`, `Item` и функции пакета `models/`.
+
+### Django-проект и приложения
+- `sizesystem/` — пакет конфигурации проекта (`settings.py`, `urls.py`);
+- `homepage` — главная страница, общий каркас страниц `page()`, страница 404;
+- `parameters` — параметры (мерки): список и страница параметра;
+- `measurements` — значения мерок пользователей: список и страница мерки;
+- `items` — вещи: список и страница вещи с проверкой размера.
+
+Для пользователей отдельное приложение не создаётся: пользователь отображается
+как владелец мерки и вещи (`value.user.name`, `item.user.name`).
+
+### Страницы и адреса
+| Страница | URL | View-функция |
+|---|---|---|
+| Главная | `/` | `homepage.views.index` |
+| Список параметров | `/parameters/` | `parameters.views.parameters` |
+| Параметр | `/parameters/<id>/` | `parameters.views.parameter_detail` |
+| Список мерок | `/measurements/` | `measurements.views.measurements` |
+| Мерка | `/measurements/<id>/` | `measurements.views.measurement_detail` |
+| Список вещей | `/items/` | `items.views.items` |
+| Вещь | `/items/<id>/` | `items.views.item_detail` |
+
+Для несуществующего идентификатора возвращается страница с кодом 404.
+Неизвестные адреса обрабатывает `handler404` (`homepage.views.page_not_found`).
+Оформление: HTML и Bootstrap 5.3 (CDN).
+
+### Запуск веб-приложения
+
+    py -m venv venv
+    venv\Scripts\activate
+    pip install -r requirements.txt
+    python manage.py migrate
+    python manage.py runserver
+
+После запуска откройте http://127.0.0.1:8000/. Консольная версия запускается
+командой `python main.py`.
+
 ## План развития
-- разработка веб-приложения (Django);
+- шаблоны Django и статические файлы;
 - подключение базы данных;
 - реализация пользователей;
 - разработка API;

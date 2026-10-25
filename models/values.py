@@ -124,3 +124,13 @@ def show_values(values: List[Value], user: User) -> None:
         print("У пользователя нет мерок")
     for value in own:
         print(f"#{value.id} {value}")
+
+
+def find_value_by_id(
+    values: List[Value], value_id: int
+) -> Optional[Value]:
+    """Найти значение мерки по идентификатору."""
+    for value in values:
+        if value.id == value_id:
+            return value
+    return None
