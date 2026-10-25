@@ -1,20 +1,23 @@
-"""Система учета размеров одежды — консольное приложение (ПР2)."""
+"""Система учета размеров одежды — консольное приложение (ПР3, ООП)."""
 from datetime import date
+from typing import List
 
-from items import (
-    add_item, find_item, get_fit_status, is_item_suitable, recommend_size,
-    CHEST_PARAMETER_ID,
+from models import Item, Parameter, User, Value
+from models.items import (
+    CHEST_PARAMETER_ID, add_item, find_item, get_fit_status,
+    is_item_suitable, show_items,
 )
-from measurements import (
-    add_measurement, get_latest_value, get_user_measurements,
-    remove_measurement,
+from models.parameters import (
+    find_parameter, get_parameter_by_id, show_parameters,
 )
-from parameters import find_parameter, get_parameter_info, sort_parameters
+from models.users import get_user_by_id, show_users
+from models.values import (
+    add_value, get_latest_amount, remove_value, show_values,
+)
 from storage import (
-    DATA_DIR, load_items, load_measurements, load_parameters, load_users,
-    save_items, save_measurements,
+    DATA_DIR, load_items, load_parameters, load_users, load_values,
+    save_items, save_parameters, save_users, save_values,
 )
-from users import get_user
 from utils import input_date, input_float, input_int
 
 MENU = """
@@ -28,108 +31,67 @@ MENU = """
 7. Добавить вещь
 8. Проверить, подходит ли вещь
 9. Удалить мерку
+10. Показать вещи
 0. Выход"""
 
 
-def show_users(users: dict[int, dict]) -> None:
-    """Вывести список пользователей."""
-    for user in users.values():
-        print(f"{user['id']}. {user['name']} <{user['email']}>")
-
-
-def show_parameters(parameters: dict[int, dict]) -> None:
-    """Вывести параметры, отсортированные по названию."""
-    for p in sort_parameters(parameters):
-        print(f"{p['id']}. {p['name']}, {p['unit']} "
-              f"(допустимо {p['min']}–{p['max']})")
-
-
-def show_measurements(
-    measurements: list[dict], parameters: dict[int, dict], user_id: int
-) -> None:
-    """Вывести мерки пользователя."""
-    own = get_user_measurements(measurements, user_id)
-    if not own:
-        print("У пользователя нет мерок")
-    for m in own:
-        p = parameters[m["parameter_id"]]
-        print(f"#{m['id']} {m['date']}: {p['name']} = "
-              f"{m['value']} {p['unit']}")
-
-
 def build_report(
-    users: dict[int, dict],
-    parameters: dict[int, dict],
-    measurements: list[dict],
-    user_id: int,
-    measure_date: date,
+    values: List[Value],
+    user: User,
+    chest: Parameter,
+    report_date: date,
 ) -> str:
     """Отчёт по обхвату груди пользователя (функция из ПР1)."""
-    user = get_user(users, user_id)
-    chest = get_latest_value(measurements, user_id, CHEST_PARAMETER_ID)
-    if user is None or chest is None:
+    amount = get_latest_amount(values, user, chest)
+    if amount is None:
         return "Недостаточно данных для отчёта"
-    info = get_parameter_info(parameters, CHEST_PARAMETER_ID)
     return (
-        f"Пользователь: {user['name']}\n"
-        f"Дата отчёта: {measure_date}\n"
-        f"{info['name']}: {chest} {info['unit']}\n"
-        f"Рекомендуемый размер: {recommend_size(chest)}"
+        f"Пользователь: {user.name}\n"
+        f"Дата отчёта: {report_date}\n"
+        f"{chest.name}: {amount} {chest.unit}\n"
+        f"Рекомендуемый размер: {Item.recommend_size(amount)}"
     )
 
 
-def add_new_measurement(
-    users: dict[int, dict],
-    parameters: dict[int, dict],
-    measurements: list[dict],
+def create_new_value(
+    users: List[User], parameters: List[Parameter], values: List[Value]
 ) -> None:
-    """Сценарий добавления мерки."""
-    user_id = input_int("ID пользователя: ")
-    if get_user(users, user_id) is None:
+    """Сценарий добавления мерки: найти User и Parameter, создать Value."""
+    user = get_user_by_id(users, input_int("ID пользователя: "))
+    if user is None:
         print("Пользователь не найден")
         return
-    parameter_id = input_int("ID параметра: ")
-    if get_parameter_info(parameters, parameter_id) is None:
+    parameter = get_parameter_by_id(parameters, input_int("ID параметра: "))
+    if parameter is None:
         print("Параметр не найден")
         return
-    value = input_float("Значение: ")
-    measure_date = input_date("Дата (ДД.ММ.ГГГГ): ")
-    result = add_measurement(
-        measurements, parameters, user_id, parameter_id, value, measure_date
-    )
-    if result is None:
+    amount = input_float("Значение: ")
+    value_date = input_date("Дата (ДД.ММ.ГГГГ): ")
+    value = add_value(values, user, parameter, amount, value_date)
+    if value is None:
         print("Мерка не добавлена: значение вне допустимых пределов "
               "или мерка на эту дату уже есть")
     else:
-        print(f"Мерка добавлена, id={result['id']}")
+        print(f"Мерка добавлена, id={value.id}")
 
 
-def main() -> None:
-    """Точка запуска: загрузка данных и цикл меню."""
-    try:
-        users = load_users(f"{DATA_DIR}/users.json")
-        parameters = load_parameters(f"{DATA_DIR}/parameters.json")
-        measurements = load_measurements(f"{DATA_DIR}/measurements.json")
-        items = load_items(f"{DATA_DIR}/items.json")
-    except ValueError as error:
-        print(f"Не удалось загрузить данные: {error}")
-        return
-    try:
-        run_menu(users, parameters, measurements, items)
-    except (EOFError, KeyboardInterrupt):
-        print("\nВвод прерван")
-    save_measurements(f"{DATA_DIR}/measurements.json", measurements)
-    save_items(f"{DATA_DIR}/items.json", items)
-    print("Данные сохранены. До свидания!")
+def check_items(
+    values: List[Value], items: List[Item], chest: Parameter
+) -> None:
+    """Проверить, подходят ли найденные вещи владельцам."""
+    for item in find_item(items, input("Название вещи: ")):
+        status = get_fit_status(is_item_suitable(values, item, chest))
+        print(f"{item}: {status}")
 
 
 def run_menu(
-    users: dict[int, dict],
-    parameters: dict[int, dict],
-    measurements: list[dict],
-    items: list[dict],
+    users: List[User],
+    parameters: List[Parameter],
+    values: List[Value],
+    items: List[Item],
 ) -> None:
     """Основной цикл меню."""
+    chest = get_parameter_by_id(parameters, CHEST_PARAMETER_ID)
     while True:
         print(MENU)
         choice = input_int("Выберите действие: ")
@@ -140,34 +102,52 @@ def run_menu(
         elif choice == 2:
             show_parameters(parameters)
         elif choice == 3:
-            found = find_parameter(parameters, input("Название: "))
-            show_parameters({p["id"]: p for p in found})
+            show_parameters(find_parameter(parameters, input("Название: ")))
         elif choice == 4:
-            add_new_measurement(users, parameters, measurements)
-        elif choice == 5:
-            show_measurements(
-                measurements, parameters, input_int("ID пользователя: "))
-        elif choice == 6:
-            print(build_report(
-                users, parameters, measurements,
-                input_int("ID пользователя: "), date.today()))
-        elif choice == 7:
-            item = add_item(
-                items, input_int("ID пользователя: "),
-                input("Название вещи: "), input("Размер: "))
-            print(f"Вещь добавлена, id={item['id']}")
+            create_new_value(users, parameters, values)
+        elif choice in (5, 6, 7):
+            user = get_user_by_id(users, input_int("ID пользователя: "))
+            if user is None:
+                print("Пользователь не найден")
+            elif choice == 5:
+                show_values(values, user)
+            elif choice == 6:
+                print(build_report(values, user, chest, date.today()))
+            else:
+                item = add_item(
+                    items, user, input("Название вещи: "), input("Размер: "))
+                print(f"Вещь добавлена, id={item.id}")
         elif choice == 8:
-            query = input("Название вещи: ")
-            for item in find_item(items, query):
-                status = get_fit_status(is_item_suitable(
-                    measurements, item["user_id"], item["size"]))
-                print(f"{item['name']} ({item['size']}): {status}")
+            check_items(values, items, chest)
         elif choice == 9:
-            done = remove_measurement(
-                measurements, input_int("ID мерки: "))
+            done = remove_value(values, input_int("ID мерки: "))
             print("Мерка удалена" if done else "Мерка не найдена")
+        elif choice == 10:
+            show_items(items)
         else:
             print("Нет такого пункта меню")
+
+
+def main() -> None:
+    """Точка запуска: загрузка объектов, меню, сохранение."""
+    try:
+        users = load_users(f"{DATA_DIR}/users.json")
+        parameters = load_parameters(f"{DATA_DIR}/parameters.json")
+        values = load_values(
+            f"{DATA_DIR}/measurements.json", users, parameters)
+        items = load_items(f"{DATA_DIR}/items.json", users)
+    except ValueError as error:
+        print(f"Не удалось загрузить данные: {error}")
+        return
+    try:
+        run_menu(users, parameters, values, items)
+    except (EOFError, KeyboardInterrupt):
+        print("\nВвод прерван")
+    save_users(f"{DATA_DIR}/users.json", users)
+    save_parameters(f"{DATA_DIR}/parameters.json", parameters)
+    save_values(f"{DATA_DIR}/measurements.json", values)
+    save_items(f"{DATA_DIR}/items.json", items)
+    print("Данные сохранены. До свидания!")
 
 
 if __name__ == "__main__":
