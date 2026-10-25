@@ -1,0 +1,6 @@
+<li class="list-group-item">
+    <a href="{% url 'parameters:detail' parameter.id %}">
+        {{ parameter.name }}, {{ parameter.unit }}
+    </a>
+    (допустимо {{ parameter.min_value }}–{{ parameter.max_value }})
+</li>

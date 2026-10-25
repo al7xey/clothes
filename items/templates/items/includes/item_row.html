@@ -1,0 +1,6 @@
+<li class="list-group-item d-flex justify-content-between">
+    <a href="{% url 'items:detail' item.id %}">
+        {{ item.name }} ({{ item.user.name }})
+    </a>
+    <span class="badge bg-secondary size-badge">размер {{ item.size }}</span>
+</li>

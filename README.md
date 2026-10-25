@@ -179,6 +179,25 @@ Django 5.2: страницы показывают данные из JSON-фай�
 После запуска откройте http://127.0.0.1:8000/. Консольная версия запускается
 командой `python main.py`.
 
+## Шаблоны Django (ПР6)
+
+HTML больше не собирается в Python-коде: view-функции передают данные
+в шаблоны через `render()`.
+
+- `templates/base.html` – базовый шаблон (Bootstrap, подключение статики,
+  блоки `title` и `content`, подвал с текущим годом);
+- `templates/includes/navigation.html` – меню, подключаемое через `include`;
+- `templates/404.html` – собственная страница ошибки 404;
+- `<приложение>/templates/<приложение>/` – шаблоны `list.html`,
+  `detail.html` и частичные шаблоны в `includes/`;
+- `static/css/main.css`, `static/js/main.js`, `static/img/logo.png` –
+  статические файлы.
+
+Используются теги `extends`, `block`, `include`, `url`, `static`, `for ... empty`,
+`if / elif / else`, фильтры `length` и `default`. Имена маршрутов имеют
+пространства имён: `homepage:index`, `parameters:list`, `parameters:detail`,
+`measurements:list`, `measurements:detail`, `items:list`, `items:detail`.
+
 ## План развития
 - шаблоны Django и статические файлы;
 - подключение базы данных;

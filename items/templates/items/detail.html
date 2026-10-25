@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ item.name }}</h5>
+        <p class="card-text"><strong>Владелец:</strong> {{ item.user.name }}</p>
+        <p class="card-text"><strong>Размер вещи:</strong> {{ item.size }}</p>
+        <p class="card-text">
+            {% if suitable is True %}
+                <span class="badge bg-success">{{ fit_status }}</span>
+            {% elif suitable is False %}
+                <span class="badge bg-danger">{{ fit_status }}</span>
+            {% else %}
+                <span class="badge bg-secondary">{{ fit_status }}</span>
+            {% endif %}
+        </p>
+        <a href="{% url 'items:list' %}" class="btn btn-outline-secondary">
+            ← к списку вещей
+        </a>
+    </div>
+</div>
+{% endblock %}

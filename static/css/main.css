@@ -1,0 +1,18 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+main {
+    flex: 1;
+}
+
+.site-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+.size-badge {
+    font-size: 0.9rem;
+}

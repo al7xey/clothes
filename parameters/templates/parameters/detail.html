@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}{{ parameter.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ parameter.name }}</h5>
+        <p class="card-text"><strong>ID:</strong> {{ parameter.id }}</p>
+        <p class="card-text">
+            <strong>Единица измерения:</strong> {{ parameter.unit|default:"не задана" }}
+        </p>
+        <p class="card-text">
+            <strong>Допустимые значения:</strong>
+            {{ parameter.min_value }}–{{ parameter.max_value }} {{ parameter.unit }}
+        </p>
+        <a href="{% url 'parameters:list' %}" class="btn btn-outline-secondary">
+            ← к списку параметров
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Мерки{% endblock %}
+
+{% block content %}
+<h1>Мерки</h1>
+<p class="text-muted">Всего мерок: {{ values|length }}</p>
+<ul class="list-group">
+    {% for value in values %}
+        {% include "measurements/includes/value_row.html" %}
+    {% empty %}
+        <li class="list-group-item">Мерок пока нет.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

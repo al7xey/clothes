@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Учет размеров одежды{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Система учета размеров одежды</h1>
+<p class="lead">Учет мерок пользователей и подбор размера вещей.</p>
+<p>Основные разделы:</p>
+<a href="{% url 'parameters:list' %}" class="btn btn-primary me-2">Параметры</a>
+<a href="{% url 'measurements:list' %}" class="btn btn-secondary me-2">Мерки</a>
+<a href="{% url 'items:list' %}" class="btn btn-success">Вещи</a>
+{% endblock %}

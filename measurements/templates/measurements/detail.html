@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Мерка №{{ value.id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Мерка №{{ value.id }}</h5>
+        <p class="card-text">Пользователь: {{ value.user.name }}</p>
+        <p class="card-text">Параметр: {{ value.parameter.name }}</p>
+        <p class="card-text">
+            Значение: {{ value.amount }} {{ value.parameter.unit }}
+        </p>
+        <p class="card-text">Дата: {{ value.value_date }}</p>
+        <p class="card-text">
+            Проверка:
+            {% if in_range %}
+                <span class="badge bg-success">в допустимых пределах</span>
+            {% else %}
+                <span class="badge bg-danger">вне пределов</span>
+            {% endif %}
+        </p>
+        <a href="{% url 'measurements:list' %}" class="btn btn-outline-secondary">
+            ← к списку мерок
+        </a>
+    </div>
+</div>
+{% endblock %}
