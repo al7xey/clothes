@@ -1,4 +1,4 @@
-"""Тесты веб-страниц (ПР5): маршруты, view-функции, коды ответов."""
+"""Тесты веб-страниц (пp5): маршруты, view-функции, коды ответов."""
 from pathlib import Path
 
 import pytest
@@ -54,7 +54,7 @@ def test_custom_404_page(client):
     assert "На главную" in text
 
 
-# ---- ПР6: шаблоны, include, namespace, статика ----
+# ---- ПР6: шаблоны, включение частей, пространства имён, статические файлы ----
 
 def test_pages_use_base_template(client):
     text = client.get("/parameters/").content.decode()
