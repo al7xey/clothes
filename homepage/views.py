@@ -24,3 +24,8 @@ def statistics(request):
 def page_not_found(request, exception):
     """Собственная страница ошибки 404."""
     return render(request, "404.html", status=404)
+
+
+def catch_all_404(request, unmatched_path):
+    """Показывает собственную страницу для неизвестного маршрута."""
+    return page_not_found(request, None)

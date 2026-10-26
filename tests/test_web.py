@@ -49,9 +49,18 @@ def test_item_page_shows_fit_status(client):
 
 @override_settings(DEBUG=False)
 def test_custom_404_page(client):
-    text = client.get("/nonexistent/").content.decode()
+    response = client.get("/nonexistent/")
+    text = response.content.decode()
+    assert response.status_code == 404
     assert "404" in text
     assert "На главную" in text
+
+
+@override_settings(DEBUG=True)
+def test_custom_404_page_in_debug_mode(client):
+    response = client.get("/333")
+    assert response.status_code == 404
+    assert "404 – страница не найдена" in response.content.decode()
 
 
 # ---- ПР6: шаблоны, включение частей, пространства имён, статические файлы ----
